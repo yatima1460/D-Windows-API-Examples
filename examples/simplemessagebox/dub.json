@@ -1,0 +1,13 @@
+{
+	"name": "simplemessagebox",
+	"copyright": "Copyright © 2019, Federico Santamorena",
+	"license": "GPL-2.0",
+	"authors": [
+		"Federico Santamorena"
+	],
+	"platforms": ["windows"],
+	"lflags-windows": [
+		"/SUBSYSTEM:windows","User32.lib"
+	],
+	"targetType": "executable"
+}
