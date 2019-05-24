@@ -1,0 +1,17 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/dlangwinapi
+dlangwinapi.so
+dlangwinapi.dylib
+dlangwinapi.dll
+dlangwinapi.a
+dlangwinapi.lib
+dlangwinapi-test-*
+*.exe
+*.o
+*.obj
+*.lst
+
+dub.selections.json
