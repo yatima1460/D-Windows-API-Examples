@@ -11,7 +11,8 @@
 ## Examples
 
 - Simple Messagebox without a window
-- Simple Window with text
+- Simple empty window
+- Window with multiline
 
 ## How to build and run
 
