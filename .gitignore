@@ -17,3 +17,6 @@ dlangwinapi-test-*
 dub.selections.json
 dmd2
 *.7z
+
+*.bin
+*.ipch
