@@ -11,17 +11,8 @@ script:
   - wget http://downloads.dlang.org/releases/2.x/2.086.0/dmd.2.086.0.windows.7z
   - 7z x dmd.2.086.0.windows.7z -mmt=8
   - dmd2/windows/bin/dub --version
-  - >
-    FILES=examples/*
-    for f in $FILES
-    do
-      echo "Processing $f file..."
- 
-      cd $f
-      ../../dmd2/windows/bin/dub.exe build -b release
-      cd ../../
-    done
-  - 
+  - FILES=examples/*
+  - for f in $FILES; do cd $f && ../../dmd2/windows/bin/dub.exe build -b release && cd ../../; done
 
 before_deploy:
  - git config --local user.name "Federico Santamorena"
