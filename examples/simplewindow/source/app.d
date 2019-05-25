@@ -4,21 +4,16 @@ import core.runtime;
 import std.string;
 import std.utf;
 
-auto toUTF16z(S)(S s)
-{
-    return toUTFz!(const(wchar)*)(s);
-}
-
-pragma(lib, "gdi32.lib");
-pragma(lib, "winmm.lib");
-
 import core.sys.windows.windows;
 
-extern(Windows)
-long WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int iCmdShow)
+extern (Windows) long WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+        LPSTR lpCmdLine, int iCmdShow)
 {
     ulong result;
-    void exceptionHandler(Throwable e) { throw e; }
+    void exceptionHandler(Throwable e)
+    {
+        throw e;
+    }
 
     try
     {
@@ -26,7 +21,7 @@ long WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int 
         result = myWinMain(hInstance, hPrevInstance, lpCmdLine, iCmdShow);
         Runtime.terminate();
     }
-    catch(Throwable o)
+    catch (Throwable o)
     {
         MessageBox(null, o.toString().toUTF16z, "Error", MB_OK | MB_ICONEXCLAMATION);
         result = 0;
@@ -35,81 +30,75 @@ long WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int 
     return result;
 }
 
-ulong myWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int iCmdShow)
+ulong myWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    string appName = "HelloWin";
-    HWND hwnd;
-    MSG  msg;
-    WNDCLASS wndclass;
+    // Register the window class.
+    const string CLASS_NAME = "Sample Window Class";
 
-    wndclass.style         = CS_HREDRAW | CS_VREDRAW;
-    wndclass.lpfnWndProc   = &WndProc;
-    wndclass.cbClsExtra    = 0;
-    wndclass.cbWndExtra    = 0;
-    wndclass.hInstance     = hInstance;
-    wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
-    wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
-    wndclass.hbrBackground = cast(HBRUSH)GetStockObject(WHITE_BRUSH);
-    wndclass.lpszMenuName  = NULL;
-    wndclass.lpszClassName = appName.toUTF16z;
+    WNDCLASS wc = {};
 
-    if(!RegisterClass(&wndclass))
+    wc.lpfnWndProc = &WindowProc;
+    wc.hInstance = hInstance;
+    wc.lpszClassName = cast(wchar*) CLASS_NAME;
+
+    RegisterClass(&wc);
+
+    // Create the window.
+
+    HWND hwnd = CreateWindowEx(0, // Optional window styles.
+            cast(wchar*) CLASS_NAME, // Window class
+            "D native window", // Window text
+            WS_OVERLAPPEDWINDOW, // Window style
+
+            // Size and position
+            CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, // Parent window    
+            NULL, // Menu
+            hInstance, // Instance handle
+            NULL // Additional application data
+            );
+
+    if (hwnd == NULL)
     {
-        MessageBox(NULL, "This program requires Windows NT!", appName.toUTF16z, MB_ICONERROR);
         return 0;
     }
 
-    hwnd = CreateWindow(appName.toUTF16z,      // window class name
-                         "D native window",  // window caption
-                         WS_OVERLAPPEDWINDOW,  // window style
-                         CW_USEDEFAULT,        // initial x position
-                         CW_USEDEFAULT,        // initial y position
-                         CW_USEDEFAULT,        // initial x size
-                         CW_USEDEFAULT,        // initial y size
-                         NULL,                 // parent window handle
-                         NULL,                 // window menu handle
-                         hInstance,            // program instance handle
-                         NULL);                // creation parameters
+    ShowWindow(hwnd, nCmdShow);
 
-    ShowWindow(hwnd, iCmdShow);
-    UpdateWindow(hwnd);
+    // Run the message loop.
 
+    MSG msg = {};
     while (GetMessage(&msg, NULL, 0, 0))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
 
-    return msg.wParam;
+    return 0;
 }
 
-extern(Windows)
-LRESULT WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) nothrow
+extern (Windows) LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) nothrow
 {
-    HDC hdc;
-    PAINTSTRUCT ps;
-    RECT rect;
-
-    switch (message)
+    switch (uMsg)
     {
-        case WM_CREATE:
-            PlaySound("hellowin.wav", NULL, SND_FILENAME | SND_ASYNC);
-            return 0;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
 
-        case WM_PAINT:
-            hdc = BeginPaint(hwnd, &ps);
-            scope(exit) EndPaint(hwnd, &ps);
+    case WM_PAINT:
+        {
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
 
-            GetClientRect(hwnd, &rect);
-            DrawText(hdc, "Hello Windows!", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-            return 0;
+            FillRect(hdc, &ps.rcPaint, cast(HBRUSH)(COLOR_WINDOW + 1));
 
-        case WM_DESTROY:
-            PostQuitMessage(0);
-            return 0;
+            EndPaint(hwnd, &ps);
+        }
 
-        default:
+        return 0;
+
+    default:
+        break;
+
     }
-
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
