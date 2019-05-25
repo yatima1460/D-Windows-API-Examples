@@ -25,7 +25,7 @@ deploy:
   provider: releases
   skip_cleanup: true
   draft: false
-  prerelease: true
+  prerelease: false
   name: $TRAVIS_COMMIT
   body: $TRAVIS_COMMIT_MESSAGE
   target_commitish: $TRAVIS_COMMIT
