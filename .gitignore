@@ -15,3 +15,5 @@ dlangwinapi-test-*
 *.lst
 
 dub.selections.json
+dmd2
+*.7z
