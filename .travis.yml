@@ -8,16 +8,18 @@ os:
 language: bash
 
 script:
+  - mkdir build
   - wget http://downloads.dlang.org/releases/2.x/2.086.0/dmd.2.086.0.windows.7z
   - 7z x dmd.2.086.0.windows.7z -mmt=8
   - dmd2/windows/bin/dub --version
   - FILES=examples/*
-  - for f in $FILES; do cd $f && ../../dmd2/windows/bin/dub.exe build -b release && cd ../../; done
+  - for f in $FILES; do cd $f && ../../dmd2/windows/bin/dub.exe build -b release && mv *.exe ../../build && cd ../../; done
 
 before_deploy:
  - rm -rf dmd2
  - git config --local user.name "Federico Santamorena"
  - git config --local user.email "federico@santamorena.me"
+ - find "build" -maxdepth 1 -not -type d
 
 deploy:
   provider: releases
@@ -30,7 +32,7 @@ deploy:
   file_glob: true
   api_key:
     secure: $GITHUB_TOKEN
-  file: build/**/*.exe
+  file: build/*.*
   on:
     repo: yatima1460/D-Windows-API-Examples
 
