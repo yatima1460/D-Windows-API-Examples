@@ -23,7 +23,7 @@ deploy:
   skip_cleanup: true
   draft: false
   prerelease: true
-  name: $TRAVIS_TAG
+  name: $TRAVIS_COMMIT
   body: $TRAVIS_COMMIT_MESSAGE
   target_commitish: $TRAVIS_COMMIT
   file_glob: true
