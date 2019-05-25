@@ -15,6 +15,7 @@ script:
   - for f in $FILES; do cd $f && ../../dmd2/windows/bin/dub.exe build -b release && cd ../../; done
 
 before_deploy:
+ - rm -rf dmd2
  - git config --local user.name "Federico Santamorena"
  - git config --local user.email "federico@santamorena.me"
 
